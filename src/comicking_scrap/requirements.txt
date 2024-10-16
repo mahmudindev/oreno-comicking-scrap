@@ -1,0 +1,4 @@
+python-dotenv
+requests
+comicking-openapi @ git+https://github.com/mahmudindes/oreno-comicking-openapi-python
+jikan-openapi @ git+https://github.com/mahmudindes/openapi-jikan-python
