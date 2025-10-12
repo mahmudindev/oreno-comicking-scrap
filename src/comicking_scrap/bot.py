@@ -30,7 +30,11 @@ class Bot:
         logger: logging.Logger,
         note_file: TextIOWrapper | None = None
     ):
-        self.client = comicking_openapi.ApiClient(configuration=comicking_openapi.Configuration(host=base_comicking))
+        self.client = comicking_openapi.ApiClient(
+            configuration=comicking_openapi.Configuration(
+                host=base_comicking
+            )
+        )
 
         self.oauth_issuer = oauth_issuer
         self.oauth_client_id = oauth_client_id
@@ -529,6 +533,24 @@ class Bot:
 
         return result
 
+    def add_image(
+        self,
+        link_website_host: str,
+        link_relative_reference: str | None = None
+    ):
+        api = comicking_openapi.ImageApi(self.client)
+
+        result = api.add_image(
+            new_image=comicking_openapi.NewImage(
+                linkWebsiteHost=link_website_host,
+                linkRelativeReference=link_relative_reference
+            )
+        )
+
+        self.logger.info('Image "%s" added', f'{link_website_host}{link_relative_reference}')
+
+        return result
+
     def add_categorytype(
         self,
         code: str,
@@ -675,25 +697,18 @@ class Bot:
     def add_comic_cover(
         self,
         comic_code: str,
-        link_website_host: str,
-        link_relative_reference: str | None = None,
-        hint: str | None = None
+        image_ulid: str
     ):
         api = comicking_openapi.ComicApi(self.client)
 
         result = api.add_comic_cover(
             comic_code,
             new_comic_cover=comicking_openapi.NewComicCover(
-                linkWebsiteHost=link_website_host,
-                linkRelativeReference=link_relative_reference,
-                hint=hint
+                imageULID=image_ulid
             )
         )
 
-        self.logger.info(
-            'Comic "%s" Cover "%s" added',
-            comic_code, f'{link_website_host}{link_relative_reference}'
-        )
+        self.logger.info('Comic "%s" Cover "%s" added', comic_code, image_ulid)
 
         return result
 
@@ -702,7 +717,7 @@ class Bot:
         comic_code: str,
         language_lang: str,
         content: str,
-        version: str | None = None
+        source: str | None = None
     ):
         api = comicking_openapi.ComicApi(self.client)
 
@@ -711,7 +726,7 @@ class Bot:
             new_comic_synopsis=comicking_openapi.NewComicSynopsis(
                 languageLang=language_lang,
                 content=content,
-                version=version
+                source=source
             )
         )
 
