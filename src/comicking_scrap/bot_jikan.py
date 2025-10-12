@@ -82,7 +82,7 @@ class BotJikan:
         api0 = comicking_openapi.ComicApi(self.bot.client)
 
         response0 = api0.list_comic(
-            external=[quote(f'linkHREF={self.website_myanimelist_host}/manga/{manga.mal_id}')]
+            external_link_href=[quote(f'{self.website_myanimelist_host}/manga/{manga.mal_id}')]
         )
 
         self.bot.authenticate()
@@ -217,6 +217,7 @@ class BotJikan:
                 time.sleep(2)
 
         api2 = comicking_openapi.WebsiteApi(self.bot.client)
+        api3 = comicking_openapi.ImageApi(self.bot.client)
 
         # Comic Cover
 
@@ -229,14 +230,34 @@ class BotJikan:
                 except comicking_openapi.ApiException as e:
                     if e.status == 404:
                         self.bot.add_link(self.website_myanimelist_cdn_host, image.path)
-
-                        self.bot.add_comic_cover(
-                            comic_code,
-                            self.website_myanimelist_cdn_host,
-                            image.path
-                        )
                     else:
                         raise e
+
+                response1Y = api3.list_image(
+                    link_href=[quote(f'{self.website_myanimelist_cdn_host}{image.path}')]
+                )
+                if len(response1Y) > 0:
+                    try:
+                        api0.get_comic_cover(comic_code, response1Y[0].ulid)
+                    except comicking_openapi.ApiException as e:
+                        if e.status == 404:
+                            self.bot.add_comic_cover(
+                                comic_code,
+                                response1Y[0].ulid
+                            )
+                        else:
+                            raise e
+                else:
+                    response1Z = self.bot.add_image(
+                        self.website_myanimelist_cdn_host,
+                        image.path
+                    )
+
+                    self.bot.add_comic_cover(
+                        comic_code,
+                        response1Z.ulid
+                    )
+
 
         # Comic Synopsis
 
@@ -245,7 +266,7 @@ class BotJikan:
                 comic_code,
                 self.bot.language_english_lang,
                 manga.synopsis,
-                version='MyAnimeList'
+                source='MyAnimeList'
             )
 
         # Comic Author
@@ -459,7 +480,10 @@ class BotJikan:
                         api1.get_link(f'{website_host}{relativeReference}')
                     except comicking_openapi.ApiException as e:
                         if e.status == 404:
-                            self.bot.add_link(website_host, relativeReference if relativeReference else None)
+                            self.bot.add_link(
+                                website_host,
+                                relativeReference if relativeReference else None
+                            )
                         else:
                             raise e
 
@@ -524,13 +548,19 @@ class BotJikan:
                             continue
 
                         response4Z = api0.list_comic(
-                            external=[quote(f'linkHREF={self.website_myanimelist_host}/manga/{mangaZ.mal_id}')]
+                            external_link_href=[
+                                quote(f'{self.website_myanimelist_host}/manga/{mangaZ.mal_id}')
+                            ]
                         )
                         if len(response4Z) < 1:
                             continue
 
                         try:
-                            api0.get_comic_relation(comic_code, manga_relation_type_code, response4Z[0].code)
+                            api0.get_comic_relation(
+                                comic_code,
+                                manga_relation_type_code,
+                                response4Z[0].code
+                            )
                         except comicking_openapi.ApiException as e:
                             if e.status == 404:
                                 self.bot.add_comic_relation(

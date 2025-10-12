@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: ComicKing
-  description: PHP Symfony-based comic catalog full-stack.
+  description: Comic catalog provider.
   license:
     name: Mozilla Public License 2.0
     url: https://spdx.org/licenses/MPL-2.0.html
@@ -13,6 +13,7 @@ tags:
   - name: Language
   - name: Website
   - name: Link
+  - name: Image
   - name: Person
   - name: Character
   - name: Magazine
@@ -46,7 +47,19 @@ paths:
             type: array
             items:
               type: string
-        - name: external
+        - name: externalLinkWebsiteHost
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+        - name: externalLinkRelativeReference
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+        - name: externalLinkHREF
           in: query
           schema:
             type: array
@@ -367,24 +380,6 @@ paths:
             type: array
             items:
               type: string
-        - name: linkWebsiteHost
-          in: query
-          schema:
-            type: array
-            items:
-              type: string
-        - name: linkRelativeReference
-          in: query
-          schema:
-            type: array
-            items:
-              type: string
-        - name: linkHREF
-          in: query
-          schema:
-            type: array
-            items:
-              type: string
       responses:
         '200':
           description: Comic cover list.
@@ -435,7 +430,7 @@ paths:
           $ref: '#/components/responses/Default'
       security:
         - BearerAuth: []
-  /rest/comics/{comicCode}/covers/{ulid}:
+  /rest/comics/{comicCode}/covers/{imageULID}:
     get:
       tags:
         - Comic
@@ -447,7 +442,7 @@ paths:
           required: true
           schema:
             type: string
-        - name: ulid
+        - name: imageULID
           in: path
           required: true
           schema:
@@ -472,7 +467,7 @@ paths:
           required: true
           schema:
             type: string
-        - name: ulid
+        - name: imageULID
           in: path
           required: true
           schema:
@@ -511,7 +506,7 @@ paths:
           required: true
           schema:
             type: string
-        - name: ulid
+        - name: imageULID
           in: path
           required: true
           schema:
@@ -945,7 +940,7 @@ paths:
           $ref: '#/components/responses/Default'
       security:
         - BearerAuth: []
-  /rest/comics/{comicCode}/authors/{typeCode}:{personCode}:
+  /rest/comics/{comicCode}/authors/{positionCode}:{personCode}:
     get:
       tags:
         - Comic
@@ -957,7 +952,7 @@ paths:
           required: true
           schema:
             type: string
-        - name: typeCode
+        - name: positionCode
           in: path
           required: true
           schema:
@@ -987,7 +982,7 @@ paths:
           required: true
           schema:
             type: string
-        - name: typeCode
+        - name: positionCode
           in: path
           required: true
           schema:
@@ -1031,7 +1026,7 @@ paths:
           required: true
           schema:
             type: string
-        - name: typeCode
+        - name: positionCode
           in: path
           required: true
           schema:
@@ -1044,224 +1039,6 @@ paths:
       responses:
         '204':
           description: Comic author deleted.
-        default:
-          $ref: '#/components/responses/Default'
-      security:
-        - BearerAuth: []
-  /rest/comics/{comicCode}/authors/{authorTypeCode}:{authorPersonCode}/notes:
-    get:
-      tags:
-        - Comic
-      summary: List comic author note.
-      operationId: listComicAuthorNote
-      parameters:
-        - name: comicCode
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: authorTypeCode
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: authorPersonCode
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: page
-          in: query
-          schema:
-            type: integer
-        - name: limit
-          in: query
-          schema:
-            type: integer
-        - name: order
-          in: query
-          schema:
-            type: string
-        - name: orderBy
-          in: query
-          schema:
-            type: array
-            items:
-              type: string
-      responses:
-        '200':
-          description: Comic author note list.
-          headers:
-            X-Total-Count:
-              schema:
-                type: integer
-            X-Pagination-Limit:
-              schema:
-                type: integer
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ComicAuthorNote'
-        default:
-          $ref: '#/components/responses/Default'
-    post:
-      tags:
-        - Comic
-      summary: Add comic author note.
-      operationId: addComicAuthorNote
-      parameters:
-        - name: comicCode
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: authorTypeCode
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: authorPersonCode
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/NewComicAuthorNote'
-        required: true
-      responses:
-        '201':
-          description: Comic author note added.
-          headers:
-            Location:
-              schema:
-                type: string
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ComicAuthorNote'
-        default:
-          $ref: '#/components/responses/Default'
-      security:
-        - BearerAuth: []
-  /rest/comics/{comicCode}/authors/{authorTypeCode}:{authorPersonCode}/notes/{ulid}:
-    get:
-      tags:
-        - Comic
-      summary: Get comic author note.
-      operationId: getComicAuthorNote
-      parameters:
-        - name: comicCode
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: authorTypeCode
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: authorPersonCode
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: ulid
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Comic author note gets.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ComicAuthorNote'
-        default:
-          $ref: '#/components/responses/Default'
-    patch:
-      tags:
-        - Comic
-      summary: Update comic author note.
-      operationId: updateComicAuthorNote
-      parameters:
-        - name: comicCode
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: authorTypeCode
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: authorPersonCode
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: ulid
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SetComicAuthorNote'
-        required: true
-      responses:
-        '200':
-          description: Comic author note updated.
-          headers:
-            Location:
-              schema:
-                type: string
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ComicAuthorNote'
-        '204':
-          description: Comic author note unmodified.
-        default:
-          $ref: '#/components/responses/Default'
-      security:
-        - BearerAuth: []
-    delete:
-      tags:
-        - Comic
-      summary: Delete comic author note.
-      operationId: deleteComicAuthorNote
-      parameters:
-        - name: comicCode
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: authorTypeCode
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: authorPersonCode
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: ulid
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '204':
-          description: Comic author note deleted.
         default:
           $ref: '#/components/responses/Default'
       security:
@@ -1532,7 +1309,7 @@ paths:
           $ref: '#/components/responses/Default'
       security:
         - BearerAuth: []
-  /rest/comics/{comicCode}/externals/{ulid}:
+  /rest/comics/{comicCode}/externals/{linkHREF}:
     get:
       tags:
         - Comic
@@ -1544,7 +1321,7 @@ paths:
           required: true
           schema:
             type: string
-        - name: ulid
+        - name: linkHREF
           in: path
           required: true
           schema:
@@ -1569,7 +1346,7 @@ paths:
           required: true
           schema:
             type: string
-        - name: ulid
+        - name: linkHREF
           in: path
           required: true
           schema:
@@ -1608,7 +1385,7 @@ paths:
           required: true
           schema:
             type: string
-        - name: ulid
+        - name: linkHREF
           in: path
           required: true
           schema:
@@ -2188,296 +1965,6 @@ paths:
           $ref: '#/components/responses/Default'
       security:
         - BearerAuth: []
-  /rest/comic-author-types:
-    get:
-      tags:
-        - Comic
-      summary: List comic author type.
-      operationId: listComicAuthorType
-      parameters:
-        - name: page
-          in: query
-          schema:
-            type: integer
-        - name: limit
-          in: query
-          schema:
-            type: integer
-        - name: order
-          in: query
-          schema:
-            type: string
-        - name: orderBy
-          in: query
-          schema:
-            type: array
-            items:
-              type: string
-      responses:
-        '200':
-          description: Comic author type list.
-          headers:
-            X-Total-Count:
-              schema:
-                type: integer
-            X-Pagination-Limit:
-              schema:
-                type: integer
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/GenericType'
-        default:
-          $ref: '#/components/responses/Default'
-    post:
-      tags:
-        - Comic
-      summary: Add comic author type.
-      operationId: addComicAuthorType
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/NewGenericType'
-        required: true
-      responses:
-        '201':
-          description: Comic author type added.
-          headers:
-            Location:
-              schema:
-                type: string
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GenericType'
-        default:
-          $ref: '#/components/responses/Default'
-      security:
-        - BearerAuth: []
-  /rest/comic-author-types/{code}:
-    get:
-      tags:
-        - Comic
-      summary: Get comic author type.
-      operationId: getComicAuthorType
-      parameters:
-        - name: code
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Comic author type gets.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GenericType'
-        default:
-          $ref: '#/components/responses/Default'
-    patch:
-      tags:
-        - Comic
-      summary: Update comic author type.
-      operationId: updateComicAuthorType
-      parameters:
-        - name: code
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SetGenericType'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/SetGenericType'
-        required: true
-      responses:
-        '200':
-          description: Comic author type updated.
-          headers:
-            Location:
-              schema:
-                type: string
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GenericType'
-        '204':
-          description: Comic author type unmodified.
-        default:
-          $ref: '#/components/responses/Default'
-      security:
-        - BearerAuth: []
-    delete:
-      tags:
-        - Comic
-      summary: Delete comic author type.
-      operationId: deleteComicAuthorType
-      parameters:
-        - name: code
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '204':
-          description: Comic author type deleted.
-        default:
-          $ref: '#/components/responses/Default'
-      security:
-        - BearerAuth: []
-  /rest/comic-relation-types:
-    get:
-      tags:
-        - Comic
-      summary: List comic relation type.
-      operationId: listComicRelationType
-      parameters:
-        - name: page
-          in: query
-          schema:
-            type: integer
-        - name: limit
-          in: query
-          schema:
-            type: integer
-        - name: order
-          in: query
-          schema:
-            type: string
-        - name: orderBy
-          in: query
-          schema:
-            type: array
-            items:
-              type: string
-      responses:
-        '200':
-          description: Comic relation type list.
-          headers:
-            X-Total-Count:
-              schema:
-                type: integer
-            X-Pagination-Limit:
-              schema:
-                type: integer
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/GenericType'
-        default:
-          $ref: '#/components/responses/Default'
-    post:
-      tags:
-        - Comic
-      summary: Add comic relation type.
-      operationId: addComicRelationType
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/NewGenericType'
-        required: true
-      responses:
-        '201':
-          description: Comic relation type added.
-          headers:
-            Location:
-              schema:
-                type: string
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GenericType'
-        default:
-          $ref: '#/components/responses/Default'
-      security:
-        - BearerAuth: []
-  /rest/comic-relation-types/{code}:
-    get:
-      tags:
-        - Comic
-      summary: Get comic relation type.
-      operationId: getComicRelationType
-      parameters:
-        - name: code
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Comic relation type gets.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GenericType'
-        default:
-          $ref: '#/components/responses/Default'
-    patch:
-      tags:
-        - Comic
-      summary: Update comic relation type.
-      operationId: updateComicRelationType
-      parameters:
-        - name: code
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SetGenericType'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/SetGenericType'
-        required: true
-      responses:
-        '200':
-          description: Comic relation type updated.
-          headers:
-            Location:
-              schema:
-                type: string
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GenericType'
-        '204':
-          description: Comic relation type unmodified.
-        default:
-          $ref: '#/components/responses/Default'
-      security:
-        - BearerAuth: []
-    delete:
-      tags:
-        - Comic
-      summary: Delete comic relation type.
-      operationId: deleteComicRelationType
-      parameters:
-        - name: code
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '204':
-          description: Comic relation type deleted.
-        default:
-          $ref: '#/components/responses/Default'
-      security:
-        - BearerAuth: []
   /rest/comics/{comicCode}/chapters:
     get:
       tags:
@@ -2883,12 +2370,6 @@ paths:
             type: array
             items:
               type: string
-        - name: volumeVolume
-          in: query
-          schema:
-            type: array
-            items:
-              type: string
       responses:
         '200':
           description: Comic volume list.
@@ -2939,7 +2420,7 @@ paths:
           $ref: '#/components/responses/Default'
       security:
         - BearerAuth: []
-  /rest/comics/{comicCode}/volumes/{volume}:
+  /rest/comics/{comicCode}/volumes/{number}:
     get:
       tags:
         - Comic Volume
@@ -2951,7 +2432,7 @@ paths:
           required: true
           schema:
             type: string
-        - name: volume
+        - name: number
           in: path
           required: true
           schema:
@@ -2976,7 +2457,7 @@ paths:
           required: true
           schema:
             type: string
-        - name: volume
+        - name: number
           in: path
           required: true
           schema:
@@ -3015,7 +2496,7 @@ paths:
           required: true
           schema:
             type: string
-        - name: volume
+        - name: number
           in: path
           required: true
           schema:
@@ -3255,24 +2736,6 @@ paths:
             type: array
             items:
               type: string
-        - name: linkWebsiteHost
-          in: query
-          schema:
-            type: array
-            items:
-              type: string
-        - name: linkRelativeReference
-          in: query
-          schema:
-            type: array
-            items:
-              type: string
-        - name: linkHREF
-          in: query
-          schema:
-            type: array
-            items:
-              type: string
       responses:
         '200':
           description: Comic volume cover list.
@@ -3328,7 +2791,7 @@ paths:
           $ref: '#/components/responses/Default'
       security:
         - BearerAuth: []
-  /rest/comics/{comicCode}/volumes/{volumeNumber}/covers/{ulid}:
+  /rest/comics/{comicCode}/volumes/{volumeNumber}/covers/{imageULID}:
     get:
       tags:
         - Comic Volume
@@ -3345,7 +2808,7 @@ paths:
           required: true
           schema:
             type: string
-        - name: ulid
+        - name: imageULID
           in: path
           required: true
           schema:
@@ -3375,7 +2838,7 @@ paths:
           required: true
           schema:
             type: string
-        - name: ulid
+        - name: imageULID
           in: path
           required: true
           schema:
@@ -3419,7 +2882,7 @@ paths:
           required: true
           schema:
             type: string
-        - name: ulid
+        - name: imageULID
           in: path
           required: true
           schema:
@@ -3427,6 +2890,296 @@ paths:
       responses:
         '204':
           description: Comic volume cover deleted.
+        default:
+          $ref: '#/components/responses/Default'
+      security:
+        - BearerAuth: []
+  /rest/comic-author-positions:
+    get:
+      tags:
+        - Comic
+      summary: List comic author position.
+      operationId: listComicAuthorPosition
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: order
+          in: query
+          schema:
+            type: string
+        - name: orderBy
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: Comic author position list.
+          headers:
+            X-Total-Count:
+              schema:
+                type: integer
+            X-Pagination-Limit:
+              schema:
+                type: integer
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GenericType'
+        default:
+          $ref: '#/components/responses/Default'
+    post:
+      tags:
+        - Comic
+      summary: Add comic author position.
+      operationId: addComicAuthorPosition
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewGenericType'
+        required: true
+      responses:
+        '201':
+          description: Comic author position added.
+          headers:
+            Location:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericType'
+        default:
+          $ref: '#/components/responses/Default'
+      security:
+        - BearerAuth: []
+  /rest/comic-author-positions/{code}:
+    get:
+      tags:
+        - Comic
+      summary: Get comic author position.
+      operationId: getComicAuthorPosition
+      parameters:
+        - name: code
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Comic author position gets.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericType'
+        default:
+          $ref: '#/components/responses/Default'
+    patch:
+      tags:
+        - Comic
+      summary: Update comic author position.
+      operationId: updateComicAuthorPosition
+      parameters:
+        - name: code
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetGenericType'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SetGenericType'
+        required: true
+      responses:
+        '200':
+          description: Comic author position updated.
+          headers:
+            Location:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericType'
+        '204':
+          description: Comic author position unmodified.
+        default:
+          $ref: '#/components/responses/Default'
+      security:
+        - BearerAuth: []
+    delete:
+      tags:
+        - Comic
+      summary: Delete comic author position.
+      operationId: deleteComicAuthorPosition
+      parameters:
+        - name: code
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Comic author position deleted.
+        default:
+          $ref: '#/components/responses/Default'
+      security:
+        - BearerAuth: []
+  /rest/comic-relation-types:
+    get:
+      tags:
+        - Comic
+      summary: List comic relation type.
+      operationId: listComicRelationType
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: order
+          in: query
+          schema:
+            type: string
+        - name: orderBy
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: Comic relation type list.
+          headers:
+            X-Total-Count:
+              schema:
+                type: integer
+            X-Pagination-Limit:
+              schema:
+                type: integer
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GenericType'
+        default:
+          $ref: '#/components/responses/Default'
+    post:
+      tags:
+        - Comic
+      summary: Add comic relation type.
+      operationId: addComicRelationType
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewGenericType'
+        required: true
+      responses:
+        '201':
+          description: Comic relation type added.
+          headers:
+            Location:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericType'
+        default:
+          $ref: '#/components/responses/Default'
+      security:
+        - BearerAuth: []
+  /rest/comic-relation-types/{code}:
+    get:
+      tags:
+        - Comic
+      summary: Get comic relation type.
+      operationId: getComicRelationType
+      parameters:
+        - name: code
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Comic relation type gets.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericType'
+        default:
+          $ref: '#/components/responses/Default'
+    patch:
+      tags:
+        - Comic
+      summary: Update comic relation type.
+      operationId: updateComicRelationType
+      parameters:
+        - name: code
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetGenericType'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SetGenericType'
+        required: true
+      responses:
+        '200':
+          description: Comic relation type updated.
+          headers:
+            Location:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericType'
+        '204':
+          description: Comic relation type unmodified.
+        default:
+          $ref: '#/components/responses/Default'
+      security:
+        - BearerAuth: []
+    delete:
+      tags:
+        - Comic
+      summary: Delete comic relation type.
+      operationId: deleteComicRelationType
+      parameters:
+        - name: code
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Comic relation type deleted.
         default:
           $ref: '#/components/responses/Default'
       security:
@@ -3875,12 +3628,12 @@ paths:
           $ref: '#/components/responses/Default'
       security:
         - BearerAuth: []
-  /rest/people:
+  /rest/images:
     get:
       tags:
-        - Person
-      summary: List person.
-      operationId: listPerson
+        - Image
+      summary: List image.
+      operationId: listImage
       parameters:
         - name: page
           in: query
@@ -3900,9 +3653,27 @@ paths:
             type: array
             items:
               type: string
+        - name: linkWebsiteHost
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+        - name: linkRelativeReference
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+        - name: linkHREF
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
       responses:
         '200':
-          description: Person list.
+          description: Image list.
           headers:
             X-Total-Count:
               schema:
@@ -3915,23 +3686,23 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Person'
+                  $ref: '#/components/schemas/Image'
         default:
           $ref: '#/components/responses/Default'
     post:
       tags:
-        - Person
-      summary: Add person.
-      operationId: addPerson
+        - Image
+      summary: Add image.
+      operationId: addImage
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NewPerson'
+              $ref: '#/components/schemas/NewImage'
         required: true
       responses:
         '201':
-          description: Person added.
+          description: Image added.
           headers:
             Location:
               schema:
@@ -3939,39 +3710,39 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Person'
+                $ref: '#/components/schemas/Image'
         default:
           $ref: '#/components/responses/Default'
       security:
         - BearerAuth: []
-  /rest/people/{code}:
+  /rest/images/{ulid}:
     get:
       tags:
-        - Person
-      summary: Get person.
-      operationId: getPerson
+        - Image
+      summary: Get image.
+      operationId: getImage
       parameters:
-        - name: code
+        - name: ulid
           in: path
           required: true
           schema:
             type: string
       responses:
         '200':
-          description: Person gets.
+          description: Image gets.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Person'
+                $ref: '#/components/schemas/Image'
         default:
           $ref: '#/components/responses/Default'
     patch:
       tags:
-        - Person
-      summary: Update person.
-      operationId: updatePerson
+        - Image
+      summary: Update image.
+      operationId: updateImage
       parameters:
-        - name: code
+        - name: ulid
           in: path
           required: true
           schema:
@@ -3980,11 +3751,11 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SetPerson'
+              $ref: '#/components/schemas/SetImage'
         required: true
       responses:
         '200':
-          description: Person updated.
+          description: Image updated.
           headers:
             Location:
               schema:
@@ -3992,27 +3763,27 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Person'
+                $ref: '#/components/schemas/Image'
         '204':
-          description: Person unmodified.
+          description: Image unmodified.
         default:
           $ref: '#/components/responses/Default'
       security:
         - BearerAuth: []
     delete:
       tags:
-        - Person
-      summary: Delete person.
-      operationId: deletePerson
+        - Image
+      summary: Delete image.
+      operationId: deleteImage
       parameters:
-        - name: code
+        - name: ulid
           in: path
           required: true
           schema:
             type: string
       responses:
         '204':
-          description: Person deleted.
+          description: Image deleted.
         default:
           $ref: '#/components/responses/Default'
       security:
@@ -4155,6 +3926,148 @@ paths:
       responses:
         '204':
           description: Character deleted.
+        default:
+          $ref: '#/components/responses/Default'
+      security:
+        - BearerAuth: []
+  /rest/people:
+    get:
+      tags:
+        - Person
+      summary: List person.
+      operationId: listPerson
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: order
+          in: query
+          schema:
+            type: string
+        - name: orderBy
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: Person list.
+          headers:
+            X-Total-Count:
+              schema:
+                type: integer
+            X-Pagination-Limit:
+              schema:
+                type: integer
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Person'
+        default:
+          $ref: '#/components/responses/Default'
+    post:
+      tags:
+        - Person
+      summary: Add person.
+      operationId: addPerson
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewPerson'
+        required: true
+      responses:
+        '201':
+          description: Person added.
+          headers:
+            Location:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+        default:
+          $ref: '#/components/responses/Default'
+      security:
+        - BearerAuth: []
+  /rest/people/{code}:
+    get:
+      tags:
+        - Person
+      summary: Get person.
+      operationId: getPerson
+      parameters:
+        - name: code
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Person gets.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+        default:
+          $ref: '#/components/responses/Default'
+    patch:
+      tags:
+        - Person
+      summary: Update person.
+      operationId: updatePerson
+      parameters:
+        - name: code
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetPerson'
+        required: true
+      responses:
+        '200':
+          description: Person updated.
+          headers:
+            Location:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+        '204':
+          description: Person unmodified.
+        default:
+          $ref: '#/components/responses/Default'
+      security:
+        - BearerAuth: []
+    delete:
+      tags:
+        - Person
+      summary: Delete person.
+      operationId: deletePerson
+      parameters:
+        - name: code
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Person deleted.
         default:
           $ref: '#/components/responses/Default'
       security:
@@ -4979,7 +4892,14 @@ components:
           type: integer
       required:
         - createdAt
+        - updatedAt
         - code
+        - publishedFrom
+        - publishedTo
+        - totalChapter
+        - totalVolume
+        - nsfw
+        - nsfl
         - titleCount
         - coverCount
         - synopsisCount
@@ -5073,9 +4993,12 @@ components:
           nullable: true
       required:
         - createdAt
+        - updatedAt
         - ulid
         - languageLang
         - content
+        - isSynonym
+        - isLatinized
     NewComicTitle:
       type: object
       properties:
@@ -5117,44 +5040,23 @@ components:
           type: string
           format: date-time
           nullable: true
-        ulid:
+        imageULID:
           type: string
-          x-go-name: ULID
-        linkWebsiteHost:
-          type: string
-        linkRelativeReference:
-          type: string
-          nullable: true
-        hint:
-          type: string
-          nullable: true
       required:
         - createdAt
-        - ulid
-        - linkWebsiteHost
+        - updatedAt
+        - imageULID
     NewComicCover:
       type: object
       properties:
-        linkWebsiteHost:
+        imageULID:
           type: string
-        linkRelativeReference:
-          type: string
-          nullable: true
-        hint:
-          type: string
-          nullable: true
       required:
-        - linkWebsiteHost
+        - imageULID
     SetComicCover:
       type: object
       properties:
-        linkWebsiteHost:
-          type: string
-          nullable: true
-        linkRelativeReference:
-          type: string
-          nullable: true
-        hint:
+        imageULID:
           type: string
           nullable: true
     ComicSynopsis:
@@ -5179,9 +5081,11 @@ components:
           nullable: true
       required:
         - createdAt
+        - updatedAt
         - ulid
         - languageLang
         - content
+        - source
     NewComicSynopsis:
       type: object
       properties:
@@ -5224,21 +5128,23 @@ components:
           nullable: true
       required:
         - createdAt
+        - updatedAt
         - characterCode
+        - isMain
     NewComicCharacter:
       type: object
       properties:
-        personCode:
+        characterCode:
           type: string
         isMain:
           type: boolean
           nullable: true
       required:
-        - personCode
+        - characterCode
     SetComicCharacter:
       type: object
       properties:
-        personCode:
+        characterCode:
           type: string
           nullable: true
         isMain:
@@ -5254,75 +5160,32 @@ components:
           type: string
           format: date-time
           nullable: true
-        typeCode:
+        positionCode:
           type: string
         personCode:
           type: string
-        noteCount:
-          type: integer
       required:
         - createdAt
-        - typeCode
+        - updatedAt
+        - positionCode
         - personCode
-        - noteCount
     NewComicAuthor:
       type: object
       properties:
-        typeCode:
+        positionCode:
           type: string
         personCode:
           type: string
       required:
-        - typeCode
+        - positionCode
         - personCode
     SetComicAuthor:
       type: object
       properties:
-        typeCode:
+        positionCode:
           type: string
           nullable: true
         personCode:
-          type: string
-          nullable: true
-    ComicAuthorNote:
-      type: object
-      properties:
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
-          nullable: true
-        ulid:
-          type: string
-          x-go-name: ULID
-        languageLang:
-          type: string
-        content:
-          type: string
-      required:
-        - createdAt
-        - ulid
-        - languageLang
-        - content
-    NewComicAuthorNote:
-      type: object
-      properties:
-        languageLang:
-          type: string
-        content:
-          type: string
-      required:
-        - languageLang
-        - content
-    SetComicAuthorNote:
-      type: object
-      properties:
-        languageLang:
-          type: string
-          nullable: true
-        content:
           type: string
           nullable: true
     ComicSerialization:
@@ -5339,6 +5202,7 @@ components:
           type: string
       required:
         - createdAt
+        - updatedAt
         - magazineCode
     NewComicSerialization:
       type: object
@@ -5363,16 +5227,10 @@ components:
           type: string
           format: date-time
           nullable: true
-        ulid:
-          type: string
-          x-go-name: ULID
         linkWebsiteHost:
-          type: string
-        linkWebsiteName:
           type: string
         linkRelativeReference:
           type: string
-          nullable: true
         isOfficial:
           type: boolean
           nullable: true
@@ -5381,9 +5239,11 @@ components:
           nullable: true
       required:
         - createdAt
-        - ulid
+        - updatedAt
         - linkWebsiteHost
-        - linkWebsiteName
+        - linkRelativeReference
+        - isOfficial
+        - isCommunity
     NewComicExternal:
       type: object
       properties:
@@ -5429,16 +5289,9 @@ components:
           type: number
         version:
           type: string
-          nullable: true
         releasedAt:
           type: string
           format: date-time
-          nullable: true
-        thumbnailLinkWebsiteHost:
-          type: string
-          nullable: true
-        thumbnailLinkRelativeReference:
-          type: string
           nullable: true
         volumeNumber:
           type: string
@@ -5447,7 +5300,11 @@ components:
           type: integer
       required:
         - createdAt
+        - updatedAt
         - number
+        - version
+        - releasedAt
+        - volumeNumber
         - titleCount
     NewComicChapter:
       type: object
@@ -5460,12 +5317,6 @@ components:
         releasedAt:
           type: string
           format: date-time
-          nullable: true
-        thumbnailLinkWebsiteHost:
-          type: string
-          nullable: true
-        thumbnailLinkRelativeReference:
-          type: string
           nullable: true
         volumeNumber:
           type: string
@@ -5484,12 +5335,6 @@ components:
         releasedAt:
           type: string
           format: date-time
-          nullable: true
-        thumbnailLinkWebsiteHost:
-          type: string
-          nullable: true
-        thumbnailLinkRelativeReference:
-          type: string
           nullable: true
         volumeNumber:
           type: string
@@ -5519,9 +5364,12 @@ components:
           nullable: true
       required:
         - createdAt
+        - updatedAt
         - ulid
         - languageLang
         - content
+        - isSynonym
+        - isLatinized
     NewComicChapterTitle:
       type: object
       properties:
@@ -5577,7 +5425,9 @@ components:
           type: string
       required:
         - createdAt
+        - updatedAt
         - number
+        - releasedAt
         - titleCount
         - coverCount
         - chapterCount
@@ -5627,9 +5477,12 @@ components:
           nullable: true
       required:
         - createdAt
+        - updatedAt
         - ulid
         - languageLang
         - content
+        - isSynonym
+        - isLatinized
     NewComicVolumeTitle:
       type: object
       properties:
@@ -5671,44 +5524,23 @@ components:
           type: string
           format: date-time
           nullable: true
-        ulid:
+        imageULID:
           type: string
-          x-go-name: ULID
-        linkWebsiteHost:
-          type: string
-        linkRelativeReference:
-          type: string
-          nullable: true
-        hint:
-          type: string
-          nullable: true
       required:
         - createdAt
-        - ulid
-        - linkWebsiteHost
+        - updatedAt
+        - imageULID
     NewComicVolumeCover:
       type: object
       properties:
-        linkWebsiteHost:
+        imageULID:
           type: string
-        linkRelativeReference:
-          type: string
-          nullable: true
-        hint:
-          type: string
-          nullable: true
       required:
-        - linkWebsiteHost
+        - imageULID
     SetComicVolumeCover:
       type: object
       properties:
-        linkWebsiteHost:
-          type: string
-          nullable: true
-        linkRelativeReference:
-          type: string
-          nullable: true
-        hint:
+        imageULID:
           type: string
           nullable: true
     ComicCategory:
@@ -5727,6 +5559,7 @@ components:
           type: string
       required:
         - createdAt
+        - updatedAt
         - categoryTypeCode
         - categoryCode
     NewComicCategory:
@@ -5764,6 +5597,7 @@ components:
           type: string
       required:
         - createdAt
+        - updatedAt
         - tagTypeCode
         - tagCode
     NewComicTag:
@@ -5801,6 +5635,7 @@ components:
           type: string
       required:
         - createdAt
+        - updatedAt
         - typeCode
         - childCode
     NewComicRelation:
@@ -5838,6 +5673,7 @@ components:
           type: string
       required:
         - createdAt
+        - updatedAt
         - lang
         - name
     NewLanguage:
@@ -5873,10 +5709,12 @@ components:
           type: string
         name:
           type: string
+          nullable: true
         linkCount:
           type: integer
       required:
         - createdAt
+        - updatedAt
         - host
         - name
         - linkCount
@@ -5887,9 +5725,9 @@ components:
           type: string
         name:
           type: string
+          nullable: true
       required: 
         - host
-        - name
     SetWebsite:
       type: object
       properties:
@@ -5913,13 +5751,15 @@ components:
           type: string
         websiteName:
           type: string
+          nullable: true
         relativeReference:
           type: string
-          nullable: true
       required:
         - createdAt
+        - updatedAt
         - websiteHost
         - websiteName
+        - relativeReference
     NewLink:
       type: object
       properties:
@@ -5939,7 +5779,7 @@ components:
         relativeReference:
           type: string
           nullable: true
-    Person:
+    Image:
       type: object
       properties:
         createdAt:
@@ -5949,22 +5789,47 @@ components:
           type: string
           format: date-time
           nullable: true
-        code:
+        ulid:
           type: string
+          x-go-name: ULID
+        alternativeText:
+          type: string
+          nullable: true
+        linkWebsiteHost:
+          type: string
+        linkRelativeReference:
+          type: string
+          nullable: true
       required:
         - createdAt
-        - code
-    NewPerson:
+        - updatedAt
+        - ulid
+        - alternativeText
+        - linkWebsiteHost
+        - linkRelativeReference
+    NewImage:
       type: object
       properties:
-        code:
+        alternativeText:
           type: string
+          nullable: true
+        linkWebsiteHost:
+          type: string
+        linkRelativeReference:
+          type: string
+          nullable: true
       required:
-        - code
-    SetPerson:
+        - linkWebsiteHost
+    SetImage:
       type: object
       properties:
-        code:
+        alternativeText:
+          type: string
+          nullable: true
+        linkWebsiteHost:
+          type: string
+          nullable: true
+        linkRelativeReference:
           type: string
           nullable: true
     Character:
@@ -5979,20 +5844,68 @@ components:
           nullable: true
         code:
           type: string
+        name:
+          type: string
       required:
         - createdAt
+        - updatedAt
         - code
+        - name
     NewCharacter:
       type: object
       properties:
         code:
           type: string
+          nullable: true
+        name:
+          type: string
       required:
-        - code
+        - name
     SetCharacter:
       type: object
       properties:
         code:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+    Person:
+      type: object
+      properties:
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+        code:
+          type: string
+        name:
+          type: string
+      required:
+        - createdAt
+        - updatedAt
+        - code
+        - name
+    NewPerson:
+      type: object
+      properties:
+        code:
+          type: string
+          nullable: true
+        name:
+          type: string
+      required:
+        - name
+    SetPerson:
+      type: object
+      properties:
+        code:
+          type: string
+          nullable: true
+        name:
           type: string
           nullable: true
     Magazine:
@@ -6007,20 +5920,30 @@ components:
           nullable: true
         code:
           type: string
+        name:
+          type: string
       required:
         - createdAt
+        - updatedAt
         - code
+        - name
     NewMagazine:
       type: object
       properties:
         code:
           type: string
+          nullable: true
+        name:
+          type: string
       required:
-        - code
+        - name
     SetMagazine:
       type: object
       properties:
         code:
+          type: string
+          nullable: true
+        name:
           type: string
           nullable: true
     Category:
@@ -6039,12 +5962,6 @@ components:
           type: string
         name:
           type: string
-        linkWebsiteHost:
-          type: string
-          nullable: true
-        linkRelativeReference:
-          type: string
-          nullable: true
         parentCode:
           type: string
           nullable: true
@@ -6052,9 +5969,11 @@ components:
           type: integer
       required:
         - createdAt
+        - updatedAt
         - typeCode
         - code
         - name
+        - parentCode
         - childCount
     NewCategory:
       type: object
@@ -6065,12 +5984,6 @@ components:
           type: string
         name:
           type: string
-        linkWebsiteHost:
-          type: string
-          nullable: true
-        linkRelativeReference:
-          type: string
-          nullable: true
         parentCode:
           type: string
           nullable: true
@@ -6088,12 +6001,6 @@ components:
           type: string
           nullable: true
         name:
-          type: string
-          nullable: true
-        linkWebsiteHost:
-          type: string
-          nullable: true
-        linkRelativeReference:
           type: string
           nullable: true
         parentCode:
@@ -6115,14 +6022,9 @@ components:
           type: string
         name:
           type: string
-        linkWebsiteHost:
-          type: string
-          nullable: true
-        linkRelativeReference:
-          type: string
-          nullable: true
       required:
         - createdAt
+        - updatedAt
         - typeCode
         - code
         - name
@@ -6135,12 +6037,6 @@ components:
           type: string
         name:
           type: string
-        linkWebsiteHost:
-          type: string
-          nullable: true
-        linkRelativeReference:
-          type: string
-          nullable: true
       required:
         - typeCode
         - code
@@ -6155,12 +6051,6 @@ components:
           type: string
           nullable: true
         name:
-          type: string
-          nullable: true
-        linkWebsiteHost:
-          type: string
-          nullable: true
-        linkRelativeReference:
           type: string
           nullable: true
     GenericType:
@@ -6179,6 +6069,7 @@ components:
           type: string
       required:
         - createdAt
+        - updatedAt
         - code
         - name
     NewGenericType:
